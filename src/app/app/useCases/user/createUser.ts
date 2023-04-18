@@ -55,7 +55,7 @@ export class CreateUserUseCase implements createUserInterface{
     async exec (input: createUserInput) : Promise<Either<ErrorBase, createUserOutput>>{
         const {user:{email,name,password,id}} = input
 
-
+        
         const emailValid = this.validator.isValidEmail(email)
 
         if(!emailValid) return Left.create(new UserEmailInvalidError())
