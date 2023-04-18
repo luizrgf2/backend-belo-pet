@@ -8,7 +8,7 @@ export interface UserInterface{
     email:string,
     password:string,
     createdAt:Date,
-    updateAt:Date,
+    updatedAt:Date,
     id:string
 }
 
@@ -55,7 +55,7 @@ export class UserEntity{
             ...user,
             id:"",
             createdAt:new Date(),
-            updateAt:new Date()
+            updatedAt:new Date()
         })
 
         const validName = entity.isValidName()
