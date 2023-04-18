@@ -9,11 +9,8 @@ export class ValidatorInMemory implements FieldsValidator{
     }
 
     isValidEmail(email: string) : boolean{
-        if(this.emailToaccept.find(item=>item === email)){
-            return true
-        }else{
-            return false
-        }
+        const isValid = this.emailToaccept.includes(email)
+        return isValid
     }
 
 }
