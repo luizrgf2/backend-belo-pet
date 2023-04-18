@@ -1,5 +1,6 @@
 import { InvalidNameError } from "../errors/invalidName";
 import { InvalidEmailError } from "../errors/user/invalidEmail";
+import { InvalidPasswordError } from "../errors/user/invalidPassword";
 import { InvalidPasswordLenError } from "../errors/user/invalidPasswordLen";
 import { InvalidPasswordUpperLetterError } from "../errors/user/invalidPasswordUpperLetter";
 
@@ -17,6 +18,21 @@ export class UserEntity{
     
     constructor(user:UserInterface){
         this.user = user
+    }
+
+    private checkEmailIsNull():Error|null{
+        if(!this.user.email) return new InvalidEmailError()
+        return null
+    }
+
+    private checkPasswordIsNull():Error|null{
+        if(!this.user.password) return new InvalidPasswordError()
+        return null
+    }
+
+    private checkNameIsNull():Error|null{
+        if(!this.user.name) return new InvalidNameError()
+        return null
     }
 
     private isValidEmail():Error|null{
@@ -58,10 +74,19 @@ export class UserEntity{
             updatedAt:new Date()
         })
 
+        const passwordIsNull = entity.checkPasswordIsNull()
+        const nameIsNull = entity.checkNameIsNull()
+        const emailIsNull = entity.checkPasswordIsNull()
+
+        if(passwordIsNull) return passwordIsNull
+        if(nameIsNull) return nameIsNull
+        if(emailIsNull) return emailIsNull
+
         const validName = entity.isValidName()
         const validEmail = entity.isValidEmail()
         const validPasswordLen =  entity.isValidPasswordLen()
         const validPasswordHasUpperLetter = entity.isValidPasswordHasUpperLetter()
+
 
         if(validName) return validName
         if(validEmail) return validEmail
