@@ -4,8 +4,10 @@ import { ErrorBase } from "../../errors/errorBase";
 import { userRepositoryImp } from "../../interfaces/repository/user";
 import { UserExistsError } from "../../errors/user/userExists";
 import { UserNotExists } from "../../errors/user/userNotExists";
-import { FieldsValidator } from "../../interfaces/validators/fieldsValidator";
 import { UserEmailInvalidError } from "../../errors/user/userEmailInvalid";
+import { EncryptorImp } from "../../interfaces/encryptor/encryptor";
+import { InvalidEmailError } from "../../../domain/errors/user/invalidEmail";
+import { FieldsValidator } from "../../interfaces/validators/fieldsValidator";
 
 interface createUser extends Omit<UserInterface,"id"|"createdAt"|"updatedAt">{
     id?:string
@@ -27,7 +29,8 @@ export class CreateUserUseCase implements createUserInterface{
 
     constructor(
         private readonly userRepo:userRepositoryImp,
-        private readonly fieldsValidator:FieldsValidator
+        private readonly encryptor:EncryptorImp,
+        private readonly validator:FieldsValidator
     ){}
 
     private async checkIfEmailExists(email:string):Promise<Either<ErrorBase,void>>{
@@ -51,30 +54,40 @@ export class CreateUserUseCase implements createUserInterface{
 
     async exec (input: createUserInput) : Promise<Either<ErrorBase, createUserOutput>>{
         const {user:{email,name,password,id}} = input
+
+
+        const emailValid = this.validator.isValidEmail(email)
+
+        if(!emailValid) return Left.create(new UserEmailInvalidError())
+
         const userData = UserEntity.create({
             email,
             name,
             password
         }) 
 
-        const validEmail = this.fieldsValidator.isValidEmail(email)
-        
-        if(!validEmail) return Left.create(new UserEmailInvalidError())
+        if(userData instanceof Error) {
+            if(userData instanceof InvalidEmailError){
+                return Left.create(new UserEmailInvalidError()) 
+            }
+            return Left.create(new ErrorBase(userData.message,400))
+        }
 
-        if(userData instanceof Error) return Left.create(new ErrorBase(userData.message,400))
+        
+        
+        userData.user.id = id
+        userData.user.password = this.encryptor.encode(userData.user.password)
+
         const userEmailExists = await this.checkIfEmailExists(email)
         if(userEmailExists.left) return Left.create(userEmailExists.left)
 
-        const userCreated = await this.createUser({
-            email,
-            name,
-            password,
-            id:id
-        })
+        const userCreated = await this.createUser(userData.user)
 
         if(userCreated.left) return Left.create(userCreated.left)
+
+
         return Right.create({
-            user:userCreated.right.user
+            user:{...userCreated.right.user,password:undefined}
         })
     }
 
