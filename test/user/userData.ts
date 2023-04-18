@@ -36,3 +36,27 @@ export const invalidUserWithPasswordUpperCaseInvalid = {
     password:"teste123",
     name:"Fernando Felipe"
 } as UserInterface
+
+export const invalidUserWithEmailNull = {
+    id:"4",
+    createdAt:new Date(),
+    updatedAt: new Date(),
+    password:"teste123",
+    name:"Fernando Felipe"
+} as UserInterface
+
+export const invalidUserWithNameNull = {
+    id:"4",
+    createdAt:new Date(),
+    email:"teste@gmail.com",
+    updatedAt: new Date(),
+    password:"teste123",
+} as UserInterface
+
+export const invalidUserWithPasswordNull = {
+    id:"4",
+    createdAt:new Date(),
+    email:"teste@gmail.com",
+    updatedAt: new Date(),
+    name:"Fernando Felipe"
+} as UserInterface
