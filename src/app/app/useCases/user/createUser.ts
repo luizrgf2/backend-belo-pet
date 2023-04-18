@@ -3,7 +3,7 @@ import { Either, Left, Right } from "../../errors/either";
 import { ErrorBase } from "../../errors/errorBase";
 import { userRepositoryImp } from "../../interfaces/repository/user";
 import { UserExistsError } from "../../errors/user/userExists";
-import { UserNotExists } from "../../errors/user/userNotExists";
+import { UserNotExistsError } from "../../errors/user/userNotExists";
 import { UserEmailInvalidError } from "../../errors/user/userEmailInvalid";
 import { EncryptorImp } from "../../interfaces/encryptor/encryptor";
 import { InvalidEmailError } from "../../../domain/errors/user/invalidEmail";
@@ -36,7 +36,7 @@ export class CreateUserUseCase implements createUserInterface{
     private async checkIfEmailExists(email:string):Promise<Either<ErrorBase,void>>{
         const userEmailExists = await this.userRepo.findByEmail(email)
         if(userEmailExists.left) {
-            if(userEmailExists.left instanceof UserNotExists){
+            if(userEmailExists.left instanceof UserNotExistsError){
                 return Right.create(undefined)
             }
             return Left.create(userEmailExists.left)
