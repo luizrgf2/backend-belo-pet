@@ -8,6 +8,7 @@ import { UserEmailInvalidError } from "../../errors/user/userEmailInvalid";
 import { EncryptorImp } from "../../interfaces/encryptor/encryptor";
 import { InvalidEmailError } from "../../../domain/errors/user/invalidEmail";
 import { FieldsValidator } from "../../interfaces/validators/fieldsValidator";
+import { EmailControllerImp } from "../../interfaces/utils/EmailController";
 
 interface createUser extends Omit<UserInterface,"id"|"createdAt"|"updatedAt">{
     id?:string
@@ -30,7 +31,8 @@ export class CreateUserUseCase implements createUserInterface{
     constructor(
         private readonly userRepo:userRepositoryImp,
         private readonly encryptor:EncryptorImp,
-        private readonly validator:FieldsValidator
+        private readonly validator:FieldsValidator,
+        private readonly emailController:EmailControllerImp
     ){}
 
     private async checkIfEmailExists(email:string):Promise<Either<ErrorBase,void>>{
@@ -50,6 +52,12 @@ export class CreateUserUseCase implements createUserInterface{
         })
         if(userData.left) return Left.create(userData.left)
         return Right.create(userData.right)
+    }
+
+    private async sendEmailToConfirmationOfUser(email:string):Promise<Either<ErrorBase,void>>{
+        const sendEmail = await this.emailController.sendEmailConfirmation(email)
+        if(sendEmail.left) return Left.create(sendEmail.left)
+        return Right.create(undefined)
     }
 
     async exec (input: createUserInput) : Promise<Either<ErrorBase, createUserOutput>>{
@@ -73,8 +81,6 @@ export class CreateUserUseCase implements createUserInterface{
             return Left.create(new ErrorBase(userData.message,400))
         }
 
-        
-        
         userData.user.id = id
         userData.user.password = this.encryptor.encode(userData.user.password)
 
@@ -85,6 +91,8 @@ export class CreateUserUseCase implements createUserInterface{
 
         if(userCreated.left) return Left.create(userCreated.left)
 
+        const sendEmail = await this.sendEmailToConfirmationOfUser(email)
+        if(sendEmail.left) return Left.create(sendEmail.left)
 
         return Right.create({
             user:{...userCreated.right.user,password:undefined}
