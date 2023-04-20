@@ -6,16 +6,18 @@ import { UserEmailInvalidError } from "../../errors/user/userEmailInvalid"
 import { EncryptorInMemory } from "../../../../../test/encryptor/encryptor"
 import { ValidatorInMemory } from "../../../../../test/utils/validatorInMemory"
 import { ErrorBase } from "../../errors/errorBase"
+import { EmailControllerInMemory } from "../../../../../test/utils/emailController"
 
 describe("createUserUseCase tests", function(){
 
     const userRepo = new UserRepoInMemory()
     const encryptor = new EncryptorInMemory()
     const fieldsValidator = new ValidatorInMemory([validUser.email])
+    const emailController = new EmailControllerInMemory()
     
     
     it("should be able to create valid user", async function(){
-        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator)
+        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator,emailController)
         const result = await sut.exec({
             user:validUser
         })
@@ -23,7 +25,7 @@ describe("createUserUseCase tests", function(){
     })
 
     it("should be able return error if try create user with email exists", async function(){
-        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator)
+        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator,emailController)
         const result = await sut.exec({
             user:validUser
         })
@@ -31,7 +33,7 @@ describe("createUserUseCase tests", function(){
     })
 
     it("should be able return error if try create user with email invalid", async function(){
-        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator)
+        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator,emailController)
         const result = await sut.exec({
             user:invalidUserWithEmailInvalid
         })
@@ -39,7 +41,7 @@ describe("createUserUseCase tests", function(){
     })
 
     it("should be able return error if try create user with email null", async function(){
-        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator)
+        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator,emailController)
         const result = await sut.exec({
             user:invalidUserWithEmailNull
         })
@@ -47,7 +49,7 @@ describe("createUserUseCase tests", function(){
     })
 
     it("should be able return error if try create user with name null", async function(){
-        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator)
+        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator,emailController)
         const result = await sut.exec({
             user:invalidUserWithNameNull
         })
@@ -55,7 +57,7 @@ describe("createUserUseCase tests", function(){
     })
 
     it("should be able return error if try create user with password null", async function(){
-        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator)
+        const sut = new CreateUserUseCase(userRepo,encryptor,fieldsValidator,emailController)
         const result = await sut.exec({
             user:invalidUserWithPasswordNull
         })
