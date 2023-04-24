@@ -10,7 +10,8 @@ export interface UserInterface{
     password:string,
     createdAt:Date,
     updatedAt:Date,
-    id:string
+    id:string,
+    emailConfirmation?:boolean
 }
 
 export class UserEntity{
