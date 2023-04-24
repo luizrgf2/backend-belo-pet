@@ -8,4 +8,6 @@ export interface userRepositoryImp{
     create:(user:createUserUserRepo)=>Promise<Either<ErrorBase,UserEntity>>
     findById:(id:string)=>Promise<Either<ErrorBase,UserEntity>>
     findByEmail:(email:string)=>Promise<Either<ErrorBase,UserEntity>>
+    findByEmailAndId:(id:string,email:string)=>Promise<Either<ErrorBase,UserEntity>>
+    confirmUserEmail:(id:string)=>Promise<Either<ErrorBase,void>>
 }
