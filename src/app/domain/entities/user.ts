@@ -77,7 +77,7 @@ export class UserEntity{
 
         const passwordIsNull = entity.checkPasswordIsNull()
         const nameIsNull = entity.checkNameIsNull()
-        const emailIsNull = entity.checkPasswordIsNull()
+        const emailIsNull = entity.checkEmailIsNull()
 
         if(passwordIsNull) return passwordIsNull
         if(nameIsNull) return nameIsNull
